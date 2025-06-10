@@ -3,12 +3,13 @@ import { authStyles } from "@/styles/auth.styles";
 import { useSSO } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
 
 const Login = () => {
   const { startSSOFlow } = useSSO();
 
   const router = useRouter();
+  const { width } = Dimensions.get("window");
 
   const handleGoogleSignIn = async () => {
     try {
@@ -41,6 +42,8 @@ const Login = () => {
           source={require("@/assets/images/auth-bg.png")}
           style={authStyles.illustration}
           resizeMode="cover"
+          width={width * 0.75}
+          height={width * 0.75}
         />
       </View>
 

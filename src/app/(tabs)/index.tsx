@@ -1,9 +1,14 @@
-import { Text, View } from "react-native";
+import { useAuth } from "@clerk/clerk-expo";
+import { Text, TouchableOpacity, View } from "react-native";
 
 const Home = () => {
+  const { signOut } = useAuth();
+
   return (
     <View>
-      <Text>index</Text>
+      <TouchableOpacity onPress={() => signOut()}>
+        <Text>Signout</Text>
+      </TouchableOpacity>
     </View>
   );
 };
