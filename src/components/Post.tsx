@@ -1,9 +1,10 @@
 import { COLORS } from "@/constants/theme";
 import { homeStyles } from "@/styles/home.styles";
+import { useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { api } from "convex/_generated/api";
 import { Id } from "convex/_generated/dataModel";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
@@ -34,8 +35,15 @@ const Post = ({ post }: Props) => {
   const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked);
   const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
 
+  const { user } = useUser();
+  const currentUser = useQuery(
+    api.users.getUserByClerkId,
+    user ? { clerkId: user.id } : "skip"
+  );
+
   const toggleLike = useMutation(api.posts.toggleLike);
   const toggleBookmark = useMutation(api.bookmarks.toggleBookmark);
+  const deletePost = useMutation(api.posts.deletePost);
 
   const handleToggleLike = async () => {
     try {
@@ -50,6 +58,14 @@ const Post = ({ post }: Props) => {
     try {
       const isPostBookmarked = await toggleBookmark({ postId: post._id });
       setIsBookmarked(isPostBookmarked);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDeletePost = async () => {
+    try {
+      await deletePost({ postId: post._id });
     } catch (error) {
       console.error(error);
     }
@@ -70,14 +86,16 @@ const Post = ({ post }: Props) => {
               transition={200}
               cachePolicy="memory-disk"
             />
-          </TouchableOpacity>
 
-          <Text style={homeStyles.postUsername}>{post.author.username}</Text>
+            <Text style={homeStyles.postUsername}>{post.author.username}</Text>
+          </TouchableOpacity>
         </Link>
 
-        <TouchableOpacity>
-          <Ionicons name="ellipsis-horizontal" size={20} color={COLORS.white} />
-        </TouchableOpacity>
+        {currentUser?._id === post.author._id && (
+          <TouchableOpacity onPress={handleDeletePost}>
+            <Ionicons name="trash" size={20} color={COLORS.white} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <Image
@@ -119,7 +137,7 @@ const Post = ({ post }: Props) => {
           {post.likes > 0 ? `${post.likes} likes` : "Be the first to like"}
         </Text>
 
-        {post.caption && (
+        {!!post.caption && (
           <View style={homeStyles.captionContainer}>
             <Text style={homeStyles.captionUsername}>
               {post.author.username}
@@ -128,7 +146,7 @@ const Post = ({ post }: Props) => {
           </View>
         )}
 
-        {post.comments && (
+        {!!post.comments && (
           <TouchableOpacity onPress={handleToggleCommentsModal}>
             <Text style={homeStyles.commentsText}>
               View all {post.comments} comments

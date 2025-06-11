@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, MutationCtx, QueryCtx } from "./_generated/server";
+import { mutation, MutationCtx, query, QueryCtx } from "./_generated/server";
 
 export const createUser = mutation({
   args: {
@@ -24,6 +24,18 @@ export const createUser = mutation({
       following: 0,
       posts: 0,
     });
+  },
+});
+
+export const getUserByClerkId = query({
+  args: { clerkId: v.string() },
+  handler: async (context, { clerkId }) => {
+    const user = await context.db
+      .query("users")
+      .withIndex("by_clerk_id", (query) => query.eq("clerkId", clerkId))
+      .unique();
+
+    return user;
   },
 });
 
