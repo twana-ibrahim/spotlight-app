@@ -82,3 +82,41 @@ export const getPosts = query({
     return postsWithInfo;
   },
 });
+
+export const toggleLike = mutation({
+  args: { postId: v.id("posts") },
+  handler: async (context, { postId }) => {
+    const currentUser = await getAuthenticatedUser(context);
+
+    const post = await context.db.get(postId);
+
+    if (!post) throw new Error("Post not found!");
+
+    const existingLike = await context.db
+      .query("likes")
+      .withIndex("by_user_and_post", (query) =>
+        query.eq("userId", currentUser._id).eq("postId", postId)
+      )
+      .first();
+
+    if (existingLike) {
+      await context.db.delete(existingLike._id);
+      await context.db.patch(postId, { likes: post.likes - 1 });
+      return false;
+    } else {
+      await context.db.insert("likes", { postId, userId: currentUser._id });
+      await context.db.patch(postId, { likes: post.likes + 1 });
+
+      if (currentUser._id !== post.userId) {
+        await context.db.insert("notifications", {
+          senderId: currentUser._id,
+          receiverId: post.userId,
+          type: "like",
+          postId,
+        });
+      }
+
+      return true;
+    }
+  },
+});

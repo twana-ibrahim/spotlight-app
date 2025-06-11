@@ -1,9 +1,12 @@
 import { COLORS } from "@/constants/theme";
 import { homeStyles } from "@/styles/home.styles";
 import { Ionicons } from "@expo/vector-icons";
+import { api } from "convex/_generated/api";
 import { Id } from "convex/_generated/dataModel";
+import { useMutation } from "convex/react";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
+import { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
@@ -25,6 +28,18 @@ type Props = {
 };
 
 const Post = ({ post }: Props) => {
+  const toggleLike = useMutation(api.posts.toggleLike);
+  const [isLiked, setIsLiked] = useState(post.isLiked);
+
+  const handleToggleLike = async () => {
+    try {
+      const isPostLiked = await toggleLike({ postId: post._id });
+      setIsLiked(isPostLiked);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <View style={homeStyles.post}>
       <View style={homeStyles.postHeader}>
@@ -57,8 +72,12 @@ const Post = ({ post }: Props) => {
 
       <View style={homeStyles.postActions}>
         <View style={homeStyles.postActionsLeft}>
-          <TouchableOpacity>
-            <Ionicons name="heart-outline" size={24} color={COLORS.white} />
+          <TouchableOpacity onPress={handleToggleLike}>
+            <Ionicons
+              name={isLiked ? "heart" : "heart-outline"}
+              size={24}
+              color={isLiked ? COLORS.primary : COLORS.white}
+            />
           </TouchableOpacity>
           <TouchableOpacity>
             <Ionicons
@@ -75,7 +94,7 @@ const Post = ({ post }: Props) => {
 
       <View style={homeStyles.postInfo}>
         <Text style={homeStyles.likesText}>
-          {post.likes ?? "Be the first to like"}
+          {post.likes > 0 ? `${post.likes} likes` : "Be the first to like"}
         </Text>
 
         {post.caption && (
@@ -89,7 +108,7 @@ const Post = ({ post }: Props) => {
 
         <TouchableOpacity>
           <Text style={homeStyles.commentsText}>
-            View all {post.likes} likes
+            View all {post.comments} comments
           </Text>
         </TouchableOpacity>
 

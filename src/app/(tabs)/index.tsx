@@ -1,15 +1,14 @@
 import Loader from "@/components/Loader";
 import NoPostsFound from "@/components/NoPostsFound";
 import Post from "@/components/Post";
-import Story from "@/components/Story";
-import { STORIES } from "@/constants/mock-data";
+import StoriesSection from "@/components/StoriesSection";
 import { COLORS } from "@/constants/theme";
 import { homeStyles } from "@/styles/home.styles";
 import { useAuth } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { api } from "convex/_generated/api";
 import { useQuery } from "convex/react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
 
 const Home = () => {
   const { signOut } = useAuth();
@@ -30,24 +29,14 @@ const Home = () => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
+      <FlatList
+        data={posts}
+        renderItem={({ item }) => <Post post={item} />}
+        keyExtractor={(item) => item._id}
+        ListHeaderComponent={<StoriesSection />}
         contentContainerStyle={{ paddingBottom: 40 }}
-      >
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={homeStyles.storiesContainer}
-        >
-          {STORIES.map((story) => (
-            <Story key={story.id} {...story} />
-          ))}
-        </ScrollView>
-
-        {posts.map((post) => (
-          <Post key={post._id} post={post} />
-        ))}
-      </ScrollView>
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   );
 };
