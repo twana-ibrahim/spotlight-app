@@ -8,6 +8,7 @@ import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import CommentsModal from "./CommentsModal";
 
 type Props = {
   post: {
@@ -28,8 +29,10 @@ type Props = {
 };
 
 const Post = ({ post }: Props) => {
-  const toggleLike = useMutation(api.posts.toggleLike);
   const [isLiked, setIsLiked] = useState(post.isLiked);
+  const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
+
+  const toggleLike = useMutation(api.posts.toggleLike);
 
   const handleToggleLike = async () => {
     try {
@@ -39,6 +42,9 @@ const Post = ({ post }: Props) => {
       console.error(error);
     }
   };
+
+  const handleToggleCommentsModal = () =>
+    setIsCommentsModalOpen((prev) => !prev);
 
   return (
     <View style={homeStyles.post}>
@@ -79,7 +85,7 @@ const Post = ({ post }: Props) => {
               color={isLiked ? COLORS.primary : COLORS.white}
             />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleToggleCommentsModal}>
             <Ionicons
               name="chatbubble-outline"
               size={22}
@@ -106,14 +112,22 @@ const Post = ({ post }: Props) => {
           </View>
         )}
 
-        <TouchableOpacity>
-          <Text style={homeStyles.commentsText}>
-            View all {post.comments} comments
-          </Text>
-        </TouchableOpacity>
+        {post.comments && (
+          <TouchableOpacity onPress={handleToggleCommentsModal}>
+            <Text style={homeStyles.commentsText}>
+              View all {post.comments} comments
+            </Text>
+          </TouchableOpacity>
+        )}
 
         <Text style={homeStyles.timeAgo}>2 hours ago</Text>
       </View>
+
+      <CommentsModal
+        postId={post._id}
+        open={isCommentsModalOpen}
+        onClose={handleToggleCommentsModal}
+      />
     </View>
   );
 };
