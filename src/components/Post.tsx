@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { api } from "convex/_generated/api";
 import { Id } from "convex/_generated/dataModel";
 import { useMutation } from "convex/react";
+import { formatDistanceToNow } from "date-fns";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { useState } from "react";
@@ -30,14 +31,25 @@ type Props = {
 
 const Post = ({ post }: Props) => {
   const [isLiked, setIsLiked] = useState(post.isLiked);
+  const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked);
   const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
 
   const toggleLike = useMutation(api.posts.toggleLike);
+  const toggleBookmark = useMutation(api.bookmarks.toggleBookmark);
 
   const handleToggleLike = async () => {
     try {
       const isPostLiked = await toggleLike({ postId: post._id });
       setIsLiked(isPostLiked);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleToggleBookmark = async () => {
+    try {
+      const isPostBookmarked = await toggleBookmark({ postId: post._id });
+      setIsBookmarked(isPostBookmarked);
     } catch (error) {
       console.error(error);
     }
@@ -93,8 +105,12 @@ const Post = ({ post }: Props) => {
             />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity>
-          <Ionicons name="bookmark-outline" size={22} color={COLORS.white} />
+        <TouchableOpacity onPress={handleToggleBookmark}>
+          <Ionicons
+            name={isBookmarked ? "bookmark" : "bookmark-outline"}
+            size={22}
+            color={COLORS.white}
+          />
         </TouchableOpacity>
       </View>
 
@@ -120,7 +136,9 @@ const Post = ({ post }: Props) => {
           </TouchableOpacity>
         )}
 
-        <Text style={homeStyles.timeAgo}>2 hours ago</Text>
+        <Text style={homeStyles.timeAgo}>
+          {formatDistanceToNow(post._creationTime, { addSuffix: true })}
+        </Text>
       </View>
 
       <CommentsModal
