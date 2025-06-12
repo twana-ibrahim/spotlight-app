@@ -106,6 +106,13 @@ export const deletePost = mutation({
       .collect();
     for (const comment of comments) await context.db.delete(comment._id);
 
+    const notifications = await context.db
+      .query("notifications")
+      .withIndex("by_post", (query) => query.eq("postId", postId))
+      .collect();
+    for (const notification of notifications)
+      await context.db.delete(notification._id);
+
     await context.storage.delete(post.storageId);
 
     await context.db.delete(postId);
