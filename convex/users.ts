@@ -27,6 +27,15 @@ export const createUser = mutation({
   },
 });
 
+export const updateUser = mutation({
+  args: { fullname: v.string(), bio: v.string() },
+  handler: async (context, args) => {
+    const currentUser = await getAuthenticatedUser(context);
+
+    await context.db.patch(currentUser._id, args);
+  },
+});
+
 export const getUserByClerkId = query({
   args: { clerkId: v.string() },
   handler: async (context, { clerkId }) => {
