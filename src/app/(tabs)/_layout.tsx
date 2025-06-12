@@ -23,7 +23,7 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="bookmark"
+        name="bookmarks"
         options={{
           tabBarIcon: ({ size, color }) => (
             <Ionicons name="bookmark" size={size} color={color} />

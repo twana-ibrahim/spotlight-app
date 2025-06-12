@@ -1,5 +1,5 @@
+import EmptyScreen from "@/components/EmptyScreen";
 import Loader from "@/components/Loader";
-import NoPostsFound from "@/components/NoPostsFound";
 import Post from "@/components/Post";
 import StoriesSection from "@/components/StoriesSection";
 import { COLORS } from "@/constants/theme";
@@ -17,7 +17,7 @@ const Home = () => {
 
   if (!posts) return <Loader />;
 
-  if (!posts.length) return <NoPostsFound />;
+  if (!posts.length) return <EmptyScreen text="post" />;
 
   return (
     <View style={homeStyles.container}>

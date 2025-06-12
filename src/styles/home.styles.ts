@@ -223,11 +223,4 @@ export const homeStyles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  noPostsFound: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  NoPostsFoundText: { fontSize: 20, color: COLORS.primary },
 });
