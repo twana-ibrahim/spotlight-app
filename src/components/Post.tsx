@@ -77,7 +77,13 @@ const Post = ({ post }: Props) => {
   return (
     <View style={homeStyles.post}>
       <View style={homeStyles.postHeader}>
-        <Link href="/(tabs)/notifications">
+        <Link
+          href={
+            currentUser?._id === post.author._id
+              ? "/(tabs)/profile"
+              : `/user/${post.author._id}`
+          }
+        >
           <TouchableOpacity style={homeStyles.postHeaderLeft}>
             <Image
               source={post.author.image}

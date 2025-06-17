@@ -56,7 +56,7 @@ const Notification = ({ notification }: Props) => {
   return (
     <View style={notificationStyles.notificationItem}>
       <View style={notificationStyles.notificationContent}>
-        <Link href="/(tabs)/notifications" asChild>
+        <Link href={`/user/${notification.senderId}`} asChild>
           <TouchableOpacity style={notificationStyles.avatarContainer}>
             <Image
               source={{ uri: notification.sender.image }}
@@ -70,7 +70,7 @@ const Notification = ({ notification }: Props) => {
         </Link>
 
         <View style={notificationStyles.notificationInfo}>
-          <Link href="/(tabs)/notifications" asChild>
+          <Link href={`/user/${notification.senderId}`} asChild>
             <TouchableOpacity>
               <Text style={notificationStyles.username}>
                 {notification.sender.username}
